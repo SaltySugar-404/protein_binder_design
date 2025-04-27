@@ -2,118 +2,93 @@
     <div class="common-layout">
         <el-header class="header">Protein Binder Design</el-header>
         <el-main class="main">
-            <el-row :gutter="10" style="width: 100%;">
-                <el-col :span="12"><!--inputs-->
-                    <el-row :gutter="10"><!--sub title-->
-                        <el-col>
-                            <h2 style="font-size: 24px;">Inputs</h2>
-                        </el-col>
-                    </el-row>
-                    <div class="model_card" id="AlphaFold2">
+            <div class="input_area">
+                <el-col><!--inputs-->
+                    <div class="sub_title"><!--sub_title-->
                         <el-row :gutter="10">
-                            <el-col>
-                                <h2 class="model_id">Alphafold2</h2>
-                            </el-col>
+                            <h2 style="font-size: 24px; margin-left: 5px;">Inputs</h2>
+                        </el-row>
+                    </div>
+                    <div class="model_area"><!--AlphaFold2-->
+                        <el-row :gutter="10">
+                            <h2 class="model_id">Alphafold2</h2>
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Sequence</h3>
-                                <el-input v-model="alphafold2_payloads.sequence" type="textarea" rows="1"
-                                    placeholder="Please input" clearable />
-                            </el-col>
+                            <h3 class="model_config">Sequence</h3>
+                            <el-input v-model="alphafold2_payloads.sequence" type="textarea" :rows="1"
+                                placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Algorithm</h3>
-                                <el-select v-model="alphafold2_payloads.algorithm"
-                                    placeholder="please select algorithm">
-                                    <el-option label="jackhmmer" value="jackhmmer" />
-                                    <el-option label="mmseqs2" value="mmseqs2" />
-                                </el-select>
-                            </el-col>
+                            <h3 class="model_config">Algorithm</h3>
+                            <el-select v-model="alphafold2_payloads.algorithm" placeholder="please select algorithm">
+                                <el-option label="jackhmmer" value="jackhmmer" />
+                                <el-option label="mmseqs2" value="mmseqs2" />
+                            </el-select>
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
-                                <el-button @click="alert_alphafold2_inputs" plain style="width: 100%">Alert
-                                    Alphafold2 Inputs</el-button>
+                                <el-button @click="check_model_status('alphafold2')" plain style="width: 100%">Alert
+                                    Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_alphafold2" plain style="width: 100%">Run
-                                    Alphafold2</el-button>
+                                <el-button @click="post_model_service('alphafold2', alphafold2_payloads)" plain
+                                    style="width: 100%">Run</el-button>
                             </el-col>
                         </el-row>
                     </div>
-                    <div class="model_card" id="RFDiffusion">
+                    <div class="model_area"><!--RFDiffusion-->
                         <el-row :gutter="10">
-                            <el-col>
-                                <h2 class="model_id">RFDiffusion</h2>
-                            </el-col>
+                            <h2 class="model_id">RFDiffusion</h2>
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Sequence</h3>
-                                <el-input v-model="rfdiffusion_payloads.input_pdb" type="textarea" rows="1"
-                                    placeholder="Awating AlphaFold2 response" disabled />
-                            </el-col>
+                            <h3 class="model_config">Sequence</h3>
+                            <el-input v-model="rfdiffusion_payloads.input_pdb" type="textarea" :rows="1"
+                                placeholder="Awating AlphaFold2 response" disabled />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Contigs</h3>
-                                <el-input v-model="rfdiffusion_payloads.contigs" type="textarea" rows="1"
-                                    placeholder="Please input" clearable />
-                            </el-col>
+                            <h3 class="model_config">Contigs</h3>
+                            <el-input v-model="rfdiffusion_payloads.contigs" type="textarea" :rows="1"
+                                placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Hotspots</h3>
-                                <el-input v-model="rfdiffusion_payloads.hotspot_res" type="textarea" rows="1"
-                                    placeholder="Please input" clearable />
-                            </el-col>
+                            <h3 class="model_config">Hotspots</h3>
+                            <el-input v-model="rfdiffusion_payloads.hotspot_res" type="textarea" :rows="1"
+                                placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col>
-                                <h3 class="model_config">Diffusion Steps</h3>
-                                <el-slider v-model="rfdiffusion_payloads.diffusion_steps" show-input :min="10"
-                                    :max="50" />
-                            </el-col>
+                            <h3 class="model_config">Diffusion Steps</h3>
+                            <el-slider v-model="rfdiffusion_payloads.diffusion_steps" show-input :min="10" :max="50" />
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
-                                <el-button @click="alert_rfdiffusion_inputs" plain style="width: 100%">Alert
-                                    RFDiffusion Inputs</el-button>
+                                <el-button @click="check_model_status('rfdiffusion')" plain style="width: 100%">Alert
+                                    Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_rfdiffusion" plain style="width: 100%">Run
-                                    RFDiffusion</el-button>
+                                <el-button @click="post_model_service('rfdiffusion', rfdiffusion_payloads)" plain
+                                    style="width: 100%">Run
+                                </el-button>
                             </el-col>
                         </el-row>
                     </div>
-                    <div class="model_card" id="ProteinMPNN">
+                    <div class="model_area"><!--ProteinMPNN-->
                         <el-row :gutter="10">
-                            <el-col :gutter="10">
-                                <h2 class="model_id">ProteinMPNN</h2>
-                            </el-col>
+                            <h2 class="model_id">ProteinMPNN</h2>
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col :gutter="10">
-                                <h3 class="model_config">Input PDB</h3>
-                                <el-input v-model="proteinmpnn_payloads.input_pdb" type="textarea" rows="1"
-                                    placeholder="Awating RFDiffusion response" disabled />
-                            </el-col>
+                            <h3 class="model_config">Input PDB</h3>
+                            <el-input v-model="proteinmpnn_payloads.input_pdb" type="textarea" :rows="1"
+                                placeholder="Awating RFDiffusion response" disabled />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col :gutter="10">
-                                <h3 class="model_config">Chains</h3>
-                                <el-input v-model="proteinmpnn_payloads.input_pdb_chains" type="textarea" rows="1"
-                                    placeholder="Please input" clearable />
-                            </el-col>
+                            <h3 class="model_config">Chains</h3>
+                            <el-input v-model="proteinmpnn_payloads.input_pdb_chains" type="textarea" :rows="1"
+                                placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
-                            <el-col :gutter="10">
-                                <h3 class="model_config">Number of Sequences per Target</h3>
-                                <el-slider v-model="proteinmpnn_payloads.num_seq_per_target" show-input :min="1"
-                                    :max="30" />
-                            </el-col>
+                            <h3 class="model_config">Number of Sequences per Target</h3>
+                            <el-slider v-model="proteinmpnn_payloads.num_seq_per_target" show-input :min="1"
+                                :max="30" />
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
@@ -127,45 +102,49 @@
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
-                                <el-button @click="alert_proteinmpnn_inputs" plain style="width: 100%">Alert
-                                    ProteinMPNN Inputs</el-button>
+                                <el-button @click="check_model_status('proteinmpnn')" plain style="width: 100%">Alert
+                                    Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_proteinmpnn" plain style="width: 100%">Run
-                                    ProteinMPNN</el-button>
+                                <el-button @click="post_model_service('proteinmpnn', proteinmpnn_payloads)" plain
+                                    style="width: 100%">Run
+                                </el-button>
                             </el-col>
                         </el-row>
                     </div>
                 </el-col>
-                <el-col :span="12" style="width: 100%;"><!--outputs-->
-                    <el-row :gutter="10"><!--sub title-->
-                        <el-col>
-                            <h2 style="font-size: 24px;">Outputs</h2>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="10">
-                        <el-col>
-                            <el-menu class="output_menu" :default-active=menu_index mode="horizontal"
-                                @select="select_menu_index" style="height: 50px;">
-                                <el-menu-item class="output_menu_item" index="1">3D
-                                </el-menu-item>
-                                <el-menu-item class="output_menu_item" index="2">Json
-                                </el-menu-item>
-                            </el-menu>
-                        </el-col>
-                    </el-row>
+            </div>
+            <div class="output_area">
+                <el-col><!--outputs-->
+                    <div class="sub_title"><!--sub title-->
+                        <el-row :gutter="10">
+                            <h2 style="font-size: 24px; margin-left: 5px;">Outputs</h2>
+                        </el-row>
+                    </div>
+                    <div class="output_tabs"><!--output_tabs-->
+                        <el-row :gutter="10">
+                            <el-col style="border: 2px solid #949494;">
+                                <el-tabs v-model="tab_index" class="output_tab" @tab-click="select_tab_index">
+                                    <el-tab-pane label="3D" name="3d">
+                                        <div ref="molContainer" class="mol-container"></div>
+                                    </el-tab-pane>
+                                    <el-tab-pane label="Json" name="json">
+                                    </el-tab-pane>
+                                </el-tabs>
+                            </el-col>
+                        </el-row>
+                    </div>
                 </el-col>
-            </el-row>
-
-
+            </div>
         </el-main>
     </div>
 </template>
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, onMounted, h } from 'vue'
 import { ElMessage } from 'element-plus'
+import type { TabsPaneContext } from 'element-plus'
 
 //configs
 const NVIDIA_API_KEY = "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";
@@ -175,15 +154,50 @@ const headers = {
     "poll-seconds": "900"
 };
 
-const model_urls = {
+const model_status_urls: { [key: string]: string } = {
+    alphafold2: "http://172.16.200.109:8181/v1/health/ready",
+    rfdiffusion: "http://172.16.200.109:8182/v1/health/ready",
+    proteinmpnn: "http://172.16.200.109:8183/v1/health/ready",
+    alphafold2_multimer: "http://172.16.200.109:8184/v1/health/ready"
+}
+
+const model_service_urls: { [key: string]: string } = {
     alphafold2: "http://172.16.200.109:8181/protein-structure/alphafold2/predict-structure-from-sequence",
     rfdiffusion: "http://172.16.200.109:8182/biology/ipd/rfdiffusion/generate",
     proteinmpnn: "http://172.16.200.109:8182/biology/ipd/proteinmpnn/predict",
     alphafold2_multimer: "http://172.16.200.109:8184/protein-structure/alphafold2/multimer/predict-structure-from-sequences"
 };
 
+async function check_model_status(model_id: string) {
+    let message = {}
+    try {
+        const response = await axios.get(model_status_urls[model_id]);
+
+        if (response.data['status'] == 'ready') {
+            message = { type: 'success', message: 'Service is ready', showClose: true }
+        } else {
+            message = { type: 'error', message: 'Service is not ready', showClose: true }
+        }
+    } catch (error) {
+        message = { type: 'error', message: 'Error:' + error, showClose: true }
+    }
+    ElMessage(message)
+    return message
+}
+
+async function post_model_service(model_id: string, payloads: any) {
+    const response = await axios.get(model_status_urls[model_id]);
+    console.log('response:' + response.data);
+    if (check_model_status(model_id).type == 'success') {
+        axios.post(model_service_urls[model_id], payloads, { headers: headers })
+            .then(response => {
+                console.log(response.data);
+            })
+    }
+}
+
 //AlphaFold2
-const alphafold2_payloads = ref({
+let alphafold2_payloads = ref({
     sequence: "",
     algorithm: "mmseqs2"
 });
@@ -191,14 +205,6 @@ const alphafold2_payloads = ref({
 function check_alphafold2_inputs() {
     let sequence = alphafold2_payloads.value.sequence;
     return /^[A-Z]+$/.test(sequence);
-}
-
-const alert_alphafold2_inputs = function () {
-    ElMessage({
-        type: 'info',
-        message: 'Sequence: ' + alphafold2_payloads.value.sequence + '\nAlgorithm: ' + alphafold2_payloads.value.algorithm,
-        showClose: true
-    })
 }
 
 function post_alphafold2() {
@@ -212,7 +218,7 @@ function post_alphafold2() {
     }
     axios({
         method: 'post',
-        url: model_urls.alphafold2,
+        url: model_service_urls.alphafold2,
         headers: headers,
         data: {
             sequence: alphafold2_payloads.value.sequence,
@@ -224,28 +230,17 @@ function post_alphafold2() {
 }
 
 //RFDiffusion
-const rfdiffusion_payloads = ref({
+let rfdiffusion_payloads = ref({
     input_pdb: "",
     contigs: "",
     hotspot_res: [],
     diffusion_steps: 15
 });
 
-function alert_rfdiffusion_inputs() {
-    ElMessage({
-        type: 'info',
-        message: 'Sequence: ' + rfdiffusion_payloads.value.input_pdb
-            + '\nContigs: ' + rfdiffusion_payloads.value.contigs
-            + '\nHotspots: ' + rfdiffusion_payloads.value.hotspot_res
-            + '\nDiffusion Steps: ' + rfdiffusion_payloads.value.diffusion_steps,
-        showClose: true
-    })
-}
-
 function post_rfdiffusion() {
     axios({
         method: 'post',
-        url: model_urls.rfdiffusion,
+        url: model_service_urls.rfdiffusion,
         headers: headers,
         data: {
             input_pdb: rfdiffusion_payloads.value.input_pdb,
@@ -259,7 +254,7 @@ function post_rfdiffusion() {
 }
 
 //ProteinMPNN
-const proteinmpnn_payloads = ref({
+let proteinmpnn_payloads = ref({
     input_pdb: "",
     ca_only: false,
     input_pdb_chains: [],
@@ -268,22 +263,10 @@ const proteinmpnn_payloads = ref({
     sampling_temp: 0.5,
 });
 
-function alert_proteinmpnn_inputs() {
-    ElMessage({
-        type: 'info',
-        message: 'Input PDB: ' + proteinmpnn_payloads.value.input_pdb
-            + '\nChains: ' + proteinmpnn_payloads.value.input_pdb_chains
-            + '\nNumber of Sequences per Target: ' + proteinmpnn_payloads.value.num_seq_per_target
-            + '\nAlpha-Carbon Only: ' + proteinmpnn_payloads.value.ca_only
-            + '\nUse Soluble Model: ' + proteinmpnn_payloads.value.use_soluble_model,
-        showClose: true
-    })
-}
-
 function post_proteinmpnn() {
     axios({
         method: 'post',
-        url: model_urls.proteinmpnn,
+        url: model_service_urls.proteinmpnn,
         headers: headers,
         data: {
             input_pdb: proteinmpnn_payloads.value.input_pdb,
@@ -297,19 +280,23 @@ function post_proteinmpnn() {
     })
 }
 
-//Output
-const menu_index = ref("1");
-const select_menu_index = (index: string) => {
-    menu_index.value = index;
-    console.log(index);
+//Output menu
+let tab_index = ref("3d");//3d json
+const select_tab_index = (tab: TabsPaneContext, event: Event) => {
+    console.log(tab, event)
 }
+
+//3d_display
+
 </script>
 
 
-<style>
+<style scoped>
 .header {
     background-color: #dfdfdf;
     height: 60px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 2px solid #949494;
 
     color: #333;
@@ -320,16 +307,31 @@ const select_menu_index = (index: string) => {
 
 .main {
     background-color: white;
-    margin: 0;
     padding: 0;
+    margin: 0;
 
     display: flex;
-    justify-content: space-between;
 }
 
+.input_area {
+    flex: 2;
 
+}
 
-.model_card {
+.output_area {
+    flex: 3;
+    padding-left: 10px;
+}
+
+.el-row {
+    margin-bottom: 5px;
+}
+
+.el-col {
+    border-radius: 5px;
+}
+
+.model_area {
     margin: 0 auto;
     padding: 10px;
     margin-bottom: 20px;
@@ -355,11 +357,16 @@ const select_menu_index = (index: string) => {
     margin-bottom: 5px;
 }
 
-.el-row {
-    margin-bottom: 10px;
+.output_tabs {
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.el-col {
-    border-radius: 4px;
+.mol-container {
+    width: 100%;
+    height: 900px;
 }
 </style>
