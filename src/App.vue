@@ -15,12 +15,12 @@
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Sequence</h3>
-                            <el-input v-model="alphafold2_payloads.sequence" type="textarea" :rows="1"
+                            <el-input v-model="alphafold2_inputs.sequence" type="textarea" :rows="1"
                                 placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Algorithm</h3>
-                            <el-select v-model="alphafold2_payloads.algorithm" placeholder="please select algorithm">
+                            <el-select v-model="alphafold2_inputs.algorithm" placeholder="please select algorithm">
                                 <el-option label="jackhmmer" value="jackhmmer" />
                                 <el-option label="mmseqs2" value="mmseqs2" />
                             </el-select>
@@ -31,8 +31,7 @@
                                     Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_model_service('alphafold2', alphafold2_payloads)" plain
-                                    style="width: 100%">Run</el-button>
+                                <el-button @click="post_alphafold2_service()" plain style="width: 100%">Run</el-button>
                             </el-col>
                         </el-row>
                     </div>
@@ -42,22 +41,22 @@
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Sequence</h3>
-                            <el-input v-model="rfdiffusion_payloads.input_pdb" type="textarea" :rows="1"
+                            <el-input v-model="rfdiffusion_inputs.input_pdb" type="textarea" :rows="1"
                                 placeholder="Awating AlphaFold2 response" disabled />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Contigs</h3>
-                            <el-input v-model="rfdiffusion_payloads.contigs" type="textarea" :rows="1"
+                            <el-input v-model="rfdiffusion_inputs.contigs" type="textarea" :rows="1"
                                 placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Hotspots</h3>
-                            <el-input v-model="rfdiffusion_payloads.hotspot_res" type="textarea" :rows="1"
+                            <el-input v-model="rfdiffusion_inputs.hotspot_res" type="textarea" :rows="1"
                                 placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Diffusion Steps</h3>
-                            <el-slider v-model="rfdiffusion_payloads.diffusion_steps" show-input :min="10" :max="50" />
+                            <el-slider v-model="rfdiffusion_inputs.diffusion_steps" show-input :min="10" :max="50" />
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
@@ -65,8 +64,7 @@
                                     Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_model_service('rfdiffusion', rfdiffusion_payloads)" plain
-                                    style="width: 100%">Run
+                                <el-button @click="post_rfdiffusion()" plain style="width: 100%">Run
                                 </el-button>
                             </el-col>
                         </el-row>
@@ -77,26 +75,25 @@
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Input PDB</h3>
-                            <el-input v-model="proteinmpnn_payloads.input_pdb" type="textarea" :rows="1"
+                            <el-input v-model="proteinmpnn_inputs.input_pdb" type="textarea" :rows="1"
                                 placeholder="Awating RFDiffusion response" disabled />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Chains</h3>
-                            <el-input v-model="proteinmpnn_payloads.input_pdb_chains" type="textarea" :rows="1"
+                            <el-input v-model="proteinmpnn_inputs.input_pdb_chains" type="textarea" :rows="1"
                                 placeholder="Please input" clearable />
                         </el-row>
                         <el-row :gutter="10">
                             <h3 class="model_config">Number of Sequences per Target</h3>
-                            <el-slider v-model="proteinmpnn_payloads.num_seq_per_target" show-input :min="1"
-                                :max="30" />
+                            <el-slider v-model="proteinmpnn_inputs.num_seq_per_target" show-input :min="1" :max="30" />
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="12">
-                                <el-checkbox class="model_config" v-model="proteinmpnn_payloads.ca_only">Alpha-Carbon
+                                <el-checkbox class="model_config" v-model="proteinmpnn_inputs.ca_only">Alpha-Carbon
                                     Only</el-checkbox>
                             </el-col>
                             <el-col :span="12">
-                                <el-checkbox class="model_config" v-model="proteinmpnn_payloads.use_soluble_model">Use
+                                <el-checkbox class="model_config" v-model="proteinmpnn_inputs.use_soluble_model">Use
                                     Soluble Model</el-checkbox>
                             </el-col>
                         </el-row>
@@ -106,8 +103,7 @@
                                     Status</el-button>
                             </el-col>
                             <el-col :span="12">
-                                <el-button @click="post_model_service('proteinmpnn', proteinmpnn_payloads)" plain
-                                    style="width: 100%">Run
+                                <el-button @click="post_proteinmpnn()" plain style="width: 100%">Run
                                 </el-button>
                             </el-col>
                         </el-row>
@@ -153,6 +149,7 @@ const headers = {
     "Authorization": `Bearer ${NVIDIA_API_KEY}`,
     "poll-seconds": "900"
 };
+const timeout=3000
 
 const model_status_urls: { [key: string]: string } = {
     alphafold2: "http://172.16.200.109:8181/v1/health/ready",
@@ -168,93 +165,173 @@ const model_service_urls: { [key: string]: string } = {
     alphafold2_multimer: "http://172.16.200.109:8184/protein-structure/alphafold2/multimer/predict-structure-from-sequences"
 };
 
-async function check_model_status(model_id: string) {
-    let message = {}
-    try {
-        const response = await axios.get(model_status_urls[model_id]);
+// async function check_model_status(model_id: string, is_alert: boolean = true) {
+//     let message = {}
+//     let is_ready = true
+//     try {
+//         const response = await axios.get(model_status_urls[model_id]);
 
-        if (response.data['status'] == 'ready') {
-            message = { type: 'success', message: 'Service is ready', showClose: true }
+//         if (response.data['status'] == 'ready') {
+//             message = { type: 'success', message: 'Service is ready', showClose: true }
+//             is_ready = true
+//         } else {
+//             message = { type: 'error', message: 'Service is not ready', showClose: true }
+//             is_ready = false
+//         }
+//     } catch (error) {
+//         message = { type: 'error', message: 'Error:' + error, showClose: true }
+//         is_ready = false
+//     }
+//     if (is_alert) ElMessage(message)
+//     return is_ready
+// }
+
+// import axios from 'axios';
+
+async function check_model_status(
+    model_id: string,
+    is_alert: boolean = true,
+    maxWaitTime: number = timeout
+): Promise<boolean> {
+    let message = {};
+    let is_ready = true;
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, maxWaitTime);
+
+    try {
+        const response = await axios.get(model_status_urls[model_id], {
+            signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.data.status === 'ready') {
+            message = { type: 'success', message: 'Service is ready', showClose: true };
+            is_ready = true;
         } else {
-            message = { type: 'error', message: 'Service is not ready', showClose: true }
+            message = { type: 'error', message: 'Service is not ready', showClose: true };
+            is_ready = false;
         }
     } catch (error) {
-        message = { type: 'error', message: 'Error:' + error, showClose: true }
+        clearTimeout(timeoutId);
+
+        if (axios.isCancel(error)) {
+            message = { type: 'error', message: 'Error: Request timed out', showClose: true };
+        } else {
+            message = { type: 'error', message: `Error: ${error.message}`, showClose: true };
+        }
+        is_ready = false;
     }
-    ElMessage(message)
-    return message
+
+    if (is_alert) ElMessage(message);
+    return is_ready;
 }
 
-async function post_model_service(model_id: string, payloads: any) {
-    const response = await axios.get(model_status_urls[model_id]);
-    console.log('response:' + response.data);
-    if (check_model_status(model_id).type == 'success') {
-        axios.post(model_service_urls[model_id], payloads, { headers: headers })
-            .then(response => {
-                console.log(response.data);
-            })
-    }
-}
+// async function post_model_service(model_id: string, inputs: any) {
+//     if (await check_model_status(model_id)) {
+//         axios.post(model_service_urls[model_id], inputs, { headers: headers })
+//             .then(response => {
+//                 console.log(response.data);
+//             })
+//     }
+// }
 
 //AlphaFold2
-let alphafold2_payloads = ref({
+let alphafold2_inputs = ref({
     sequence: "",
     algorithm: "mmseqs2"
 });
 
 function check_alphafold2_inputs() {
-    let sequence = alphafold2_payloads.value.sequence;
+    let sequence = alphafold2_inputs.value.sequence;
     return /^[A-Z]+$/.test(sequence);
 }
 
-function post_alphafold2() {
+async function post_alphafold2_service() {
     if (!check_alphafold2_inputs()) {
         ElMessage({
             type: 'error',
             message: 'Invalid sequence input. Please enter a valid sequence.',
             showClose: true
-        });
-        return;
-    }
-    axios({
-        method: 'post',
-        url: model_service_urls.alphafold2,
-        headers: headers,
-        data: {
-            sequence: alphafold2_payloads.value.sequence,
-            algorithm: alphafold2_payloads.value.algorithm
+        })
+    } else {
+        if (!await check_model_status('alphafold2', false)) {
+            ElMessage({
+                type: 'error',
+                message: 'Service is not ready',
+                showClose: true
+            });
+
+        } else {
+            axios({
+                method: 'post',
+                url: model_service_urls.alphafold2,
+                headers: headers,
+                data: {
+                    sequence: alphafold2_inputs.value.sequence,
+                    algorithm: alphafold2_inputs.value.algorithm
+                }
+            }).then((res) => {
+                console.log(res)//输入到RFDiffusion
+            })
         }
-    }).then((res) => {
-        console.log(res);
-    })
+    }
 }
 
 //RFDiffusion
-let rfdiffusion_payloads = ref({
+let rfdiffusion_inputs = ref({
     input_pdb: "",
     contigs: "",
     hotspot_res: [],
     diffusion_steps: 15
 });
 
-function post_rfdiffusion() {
-    axios({
-        method: 'post',
-        url: model_service_urls.rfdiffusion,
-        headers: headers,
-        data: {
-            input_pdb: rfdiffusion_payloads.value.input_pdb,
-            contigs: rfdiffusion_payloads.value.contigs,
-            hotspot_res: rfdiffusion_payloads.value.hotspot_res,
-            diffusion_steps: rfdiffusion_payloads.value.diffusion_steps
+function check_rfdiffusion_inputs() {
+    if (rfdiffusion_inputs.value.input_pdb.length &&
+        rfdiffusion_inputs.value.contigs.length &&
+        rfdiffusion_inputs.value.hotspot_res.length
+    ) return true
+    return false
+}
+
+async function post_rfdiffusion() {
+    if (!check_rfdiffusion_inputs()) {
+        ElMessage({
+            type: 'error',
+            message: 'Awiting AlphaFold2 response',
+            showClose: true
+        })
+    }
+    else {
+        if (!await check_model_status('rfdiffusion', false)) {
+            ElMessage({
+                type: 'error',
+                message: 'Service is not ready',
+                showClose: true
+            });
+        } else {
+            axios({
+                method: 'post',
+                url: model_service_urls.alphafold2,
+                headers: headers,
+                data: {
+                    input_pdb: rfdiffusion_inputs.value.input_pdb,
+                    contigs: rfdiffusion_inputs.value.contigs,
+                    hotspot_res: rfdiffusion_inputs.value.hotspot_res,
+                    diffusion_steps: rfdiffusion_inputs.value.diffusion_steps
+                }
+            }).then((res) => {
+                console.log(res)//输入到ProteinMPNN
+            })
         }
-    }).then((res) => {
-        console.log(res);
-    })
+    }
 }
 
 //ProteinMPNN
-let proteinmpnn_payloads = ref({
+let proteinmpnn_inputs = ref({
     input_pdb: "",
     ca_only: false,
     input_pdb_chains: [],
@@ -263,22 +340,52 @@ let proteinmpnn_payloads = ref({
     sampling_temp: 0.5,
 });
 
-function post_proteinmpnn() {
-    axios({
-        method: 'post',
-        url: model_service_urls.proteinmpnn,
-        headers: headers,
-        data: {
-            input_pdb: proteinmpnn_payloads.value.input_pdb,
-            ca_only: proteinmpnn_payloads.value.ca_only,
-            input_pdb_chains: proteinmpnn_payloads.value.input_pdb_chains,
-            use_soluble_model: proteinmpnn_payloads.value.use_soluble_model,
-            num_seq_per_target: proteinmpnn_payloads.value.num_seq_per_target
-        }
-    }).then((res) => {
-        console.log(res);
-    })
+function check_proteinmpnn_inputs() {
+    if (proteinmpnn_inputs.value.input_pdb.length &&
+        proteinmpnn_inputs.value.input_pdb_chains.length
+    ) return true
+    return false
 }
+
+async function post_proteinmpnn() {
+    if (!check_proteinmpnn_inputs()) {
+        ElMessage({
+            type: 'error',
+            message: 'Awiting RFDiffusion response',
+            showClose: true
+        })
+    }
+    else {
+        if (!await check_model_status('proteinmpnn', false)) {
+            ElMessage({
+                type: 'error',
+                message: 'Service is not ready',
+                showClose: true
+            });
+        } else {
+            axios({
+                method: 'post',
+                url: model_service_urls.alphafold2,
+                headers: headers,
+                data: {
+                    input_pdb: proteinmpnn_inputs.value.input_pdb,
+                    ca_only: proteinmpnn_inputs.value.ca_only,
+                    input_pdb_chains: proteinmpnn_inputs.value.input_pdb_chains,
+                    use_soluble_model: proteinmpnn_inputs.value.use_soluble_model,
+                    num_seq_per_target: proteinmpnn_inputs.value.num_seq_per_target
+                }
+            }).then((res) => {
+                console.log(res)//输出，或输入至Alphafold2_Multimer
+            })
+        }
+    }
+}
+
+//Alphafold2_Multimer
+let alphafold2_multimer_inputs = ref({
+    sequences: [],
+    algorithm: 'mmseqs2'
+});
 
 //Output menu
 let tab_index = ref("3d");//3d json
@@ -293,7 +400,7 @@ const select_tab_index = (tab: TabsPaneContext, event: Event) => {
 
 <style scoped>
 .header {
-    background-color: #dfdfdf;
+    background-color: white;
     height: 60px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -333,7 +440,7 @@ const select_tab_index = (tab: TabsPaneContext, event: Event) => {
 
 .model_area {
     margin: 0 auto;
-    padding: 10px;
+    padding: 20px;
     margin-bottom: 20px;
     background-color: white;
     border-radius: 10px;
@@ -367,6 +474,5 @@ const select_tab_index = (tab: TabsPaneContext, event: Event) => {
 
 .mol-container {
     width: 100%;
-    height: 900px;
 }
 </style>
